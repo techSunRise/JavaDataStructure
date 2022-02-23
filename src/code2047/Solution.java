@@ -12,25 +12,87 @@ package code2047;
 */
 
 public class Solution {
-    public int countValidWords(String sentence) {
 
+    public static void main(String[] args) {
+        Solution s = new Solution();
+        s.countValidWords("he bought 2 pencils, 3 erasers, and 1  pencil-sharpener.");
+    }
+
+    public int countValidWords(String sentence) {
+        String[] sentences = sentence.split(" ");
+        DataStack stack = new DataStack();
+        int num = 0;
+        for(int i = 0 ; i < sentences.length ; i++){
+            int j = 0;
+            for( ; j < sentences[i].length() ; j++){
+                char c = sentences[i].charAt(j);
+                char topC = stack.getTop();
+                if(Character.isDigit(c)){
+                    stack.length = 0;
+                    stack.lianFlag = false;
+                    stack.biaoFlag = false;
+                    break;
+                }
+                else if(Character.isLetter(c) && stack.biaoFlag){
+                    stack.length = 0;
+                    stack.lianFlag = false;
+                    stack.biaoFlag = false;
+                    break;
+                }
+                else if(c == '-' && (!Character.isLetter(topC) || stack.lianFlag)){
+                    stack.length = 0;
+                    stack.lianFlag = false;
+                    stack.biaoFlag = false;
+                    break;
+                }
+                else if((c == ',' || c == '.' || c == '!') && (stack.biaoFlag || topC == '-')){
+                    stack.length = 0;
+                    stack.lianFlag = false;
+                    stack.biaoFlag = false;
+                    break;
+                }else{
+                    if(c != ' '){
+                        stack.push(c);
+                    }
+                    if(c == '.' || c == ',' || c == '!'){
+                        stack.biaoFlag = true;
+                    }
+                    if(c == '-'){
+                        stack.lianFlag = true;
+                    }
+                }
+            }
+            if(j == sentences[i].length() && stack.getTop() != '-' && sentences[i].length() != 0 && (sentences[i].length() == stack.length)){
+                num++;
+            }
+            stack.length = 0;
+            stack.lianFlag = false;
+            stack.biaoFlag = false;
+        }
+        return num;
     }
 }
 
 class DataStack{
 
-    public char[] stack = new char[255];
+    private int size = 18;
+    private char[] stack = new char[size];
+    public int length = 0;
+    public boolean lianFlag = false;
+    public boolean biaoFlag = false;
 
-    public void push(){
-
+    public int push(char data){
+        stack[length] = data;
+        length++;
+        return length - 1;
     }
 
-    public void pop(){
-
-    }
-
-    public void getTop(){
-
+    public char getTop(){
+        if(length == 0){
+            return ' ';
+        }else{
+            return stack[length - 1];
+        }
     }
 
 }
